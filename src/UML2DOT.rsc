@@ -29,10 +29,10 @@ public str dotDiagram2(M3 m) {
          '  <} /* this is the end of the for loop */>
          '
          '  <for (<from, to> <- m@extends) {>
-         '  \"N<to>\" -\> \"N<from>\" [arrowhead=\"empty\"]<}>
+         '  \"N<from>\" -\> \"N<to>\" [arrowhead=\"empty\"]<}>
          '}
          '  <for (<from, to> <- m@implements) {>
-         '  \"N<to>\" -\> \"N<from>\" [arrowhead=\"empty\"]<}>
+         '  \"N<from>\" -\> \"N<to>\" [arrowhead=\"empty\"]<}>
          '}";
 }
 
