@@ -26,7 +26,9 @@ public Project makeProject(loc projectLocation){
 private set[Class] makeClasses(M3 m){
 	set[Class] allClasses = {};
 	for(cl <- classes(m)){
-		allClasses = allClasses + class(cl,"ja", class(), none(), pub(), {});
+		//set[loc] methods = {m | m<- m@containment[cl], m.scheme == "java+method"};
+		allClasses = allClasses + class(cl,cl.path[1..], class(), none(), pub(), {});
+	
 	}
 	return allClasses;
 }
