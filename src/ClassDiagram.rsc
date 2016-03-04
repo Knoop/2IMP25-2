@@ -6,6 +6,28 @@ import lang::ofg::ast::Java2OFG;
 
 data Project = project(set[Class] classes, set[ClassRelation] relations);
 
+
+public Project makeProject(loc projectLocation){
+	
+	// Obtain M3 and OFG
+	
+	
+	
+	
+}
+
+// Creates a set of all classes from the given M3. 
+private set[Class] makeClasses(M3 m){
+
+	return {};
+}
+
+private set[ClassRelation] makeClassRelations(){
+
+}
+
+
+
 // Each class has a type, a modifier for that type and a set of declarations
 data Class = class(loc id, ClassType cType, InheritanceModifier cIModifier, AccessModifier cAModifier, set[Decl] declarations);
 
