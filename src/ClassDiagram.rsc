@@ -24,8 +24,11 @@ public Project makeProject(loc projectLocation){
 
 // Creates a set of all classes from the given M3. 
 private set[Class] makeClasses(M3 m){
-
-	return {};
+	set[Class] allClasses = {};
+	for(cl <- classes(m)){
+		allClasses = allClasses + class(cl,"ja", class(), none(), pub(), {});
+	}
+	return allClasses;
 }
 
 private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
@@ -36,7 +39,7 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Progr
 
 
 // Each class has a type, a modifier for that type and a set of declarations
-data Class = class(loc id, ClassType cType, InheritanceModifier cIModifier, AccessModifier cAModifier, set[Decl] declarations);
+data Class = class(loc id, str name, ClassType cType, InheritanceModifier cIModifier, AccessModifier cAModifier, set[Decl] declarations);
 
 data ClassType 
  	= enum()
