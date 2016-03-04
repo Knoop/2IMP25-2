@@ -38,7 +38,18 @@ private set[Class] makeClasses(M3 m){
 
 private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
 
-	return {};
+	set[ClassRelation] relations = {};
+
+	for(<from, to> <- m@extends){
+		relations += generalization(to, from);
+	}
+	
+	for(<from, to> <- m@implements){
+		relations += realization(to, from);
+	}
+	
+	
+	return relations;
 }
 
 
@@ -66,6 +77,7 @@ data InheritanceModifier
 	
 data ClassRelation
 	= association(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
+	| aggregration(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
 	| dependency(loc a, loc b)
 	| generalization(loc a, loc b)
 	| realization(loc a, loc b)
