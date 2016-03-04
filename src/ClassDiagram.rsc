@@ -33,7 +33,18 @@ private set[Class] makeClasses(M3 m){
 
 private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
 
-	return {};
+	set[ClassRelation] relations = {};
+
+	for(<from, to> <- m@extends){
+		relations += generalization(to, from);
+	}
+	
+	for(<from, to> <- m@implements){
+		relations += realization(to, from);
+	}
+	
+	
+	return relations;
 }
 
 
