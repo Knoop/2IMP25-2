@@ -5,6 +5,8 @@ import lang::ofg::ast::Java2OFG;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 
+import IO;
+
 data Project = project(set[Class] classes, set[ClassRelation] relations);
 
 
@@ -25,8 +27,9 @@ public Project makeProject(loc projectLocation){
 // Creates a set of all classes from the given M3. 
 private set[Class] makeClasses(M3 m){
 	set[Class] allClasses = {};
+	AccessModifier cAModifier;
 	for(cl <- classes(m)){
-		//set[loc] methods = {m | m<- m@containment[cl], m.scheme == "java+method"};
+		set[Modifier] modi = m@modifiers[cl];
 		allClasses = allClasses + class(cl,cl.path[1..], class(), none(), pub(), {});
 	
 	}
