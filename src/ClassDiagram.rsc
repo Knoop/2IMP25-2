@@ -6,6 +6,7 @@ import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 
 import IO;
+import ListRelation;
 
 data Project = project(set[Class] classes, set[ClassRelation] relations);
 
@@ -27,29 +28,34 @@ public Project makeProject(loc projectLocation){
 // Creates a set of all classes from the given M3. 
 private set[Class] makeClasses(M3 m){
 	set[Class] allClasses = {};
-	AccessModifier cAModifier;
 	for(cl <- classes(m)){
-		set[Modifier] modi = m@modifiers[cl];
-		allClasses = allClasses + class(cl,cl.path[1..], class(), none(), pub(), {});
+		allClasses += class(cl,cl.path[1..], class(), getIM(m,cl), getAM(m,cl), {});
 	
 	}
 	return allClasses;
 }
 
+private AccessModifier getAM(M3 m, loc l ){
+	set[Modifier] modi = { f | f <- m@modifiers[l]};
+	println(modi);
+	return final();
+}
+
+private InheritanceModifier getIM(M3 m, loc l ){
+	set[Modifier] modi = { f | f <- m@modifiers[l]};
+	println(modi);
+	return pub();
+}
+
+private set[method] makeMethods(M3 m3model, class cl){
+	list[loc] methodsSet = { m | m <- M3model@containment[cl], m.scheme == "java+method"};
+
+	
+}
+
 private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
 
-	set[ClassRelation] relations = {};
-
-	for(<from, to> <- m@extends){
-		relations += generalization(to, from);
-	}
-	
-	for(<from, to> <- m@implements){
-		relations += realization(to, from);
-	}
-	
-	
-	return relations;
+	return {};
 }
 
 
@@ -77,7 +83,6 @@ data InheritanceModifier
 	
 data ClassRelation
 	= association(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
-	| aggregration(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
 	| dependency(loc a, loc b)
 	| generalization(loc a, loc b)
 	| realization(loc a, loc b)
