@@ -74,6 +74,7 @@ data InheritanceModifier
 	
 data ClassRelation
 	= association(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
+	| aggregration(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
 	| dependency(loc a, loc b)
 	| generalization(loc a, loc b)
 	| realization(loc a, loc b)
