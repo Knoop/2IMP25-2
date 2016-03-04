@@ -2,7 +2,8 @@ module ClassDiagram
 
 import lang::ofg::ast::FlowLanguage;
 import lang::ofg::ast::Java2OFG;
-
+import lang::java::jdt::m3::Core;
+import lang::java::jdt::m3::AST;
 
 data Project = project(set[Class] classes, set[ClassRelation] relations);
 
@@ -10,9 +11,14 @@ data Project = project(set[Class] classes, set[ClassRelation] relations);
 public Project makeProject(loc projectLocation){
 	
 	// Obtain M3 and OFG
+	m = createM3FromEclipseProject(projectLocation);
+	p = createOFG(projectLocation);
 	
+	allClasses = makeClasses(m);
 	
+	allRelations = makeClassRelations(allClasses, m, p);
 	
+	return project(allClasses, allRelations);
 	
 }
 
@@ -22,8 +28,9 @@ private set[Class] makeClasses(M3 m){
 	return {};
 }
 
-private set[ClassRelation] makeClassRelations(){
+private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
 
+	return {};
 }
 
 
