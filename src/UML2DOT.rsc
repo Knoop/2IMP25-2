@@ -26,8 +26,6 @@ public str dotDiagram2(Project p) {
 }
 
 public void callMe(){
-	Class a = class(|java+class://class|, class(), none(), pub(), {});
-	Class b = class(|java+class://class2|, class(), abstract(), pub(), {});
-	Project p = project({a, b},{generalization(b.id, a.id)});
+	Project p = makeProject(|project://eLib|);
 	showDot2(p,|project://Assignment2/out/uml.dot|);
 }
