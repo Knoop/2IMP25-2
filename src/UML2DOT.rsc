@@ -26,6 +26,18 @@ public str dotDiagram2(Project p) {
          '  <for (realization(a,b) <- p.relations) {>
          '  \"N<b>\" -\> \"N<a>\" [arrowhead=\"empty\" style=\"dashed\"]
          '  <}>
+         '  <for (association(a,b, name, mu_l, mu_h) <- p.relations) {>
+         '  \"N<b>\" -\> \"N<a>\" [arrowhead=\"none\"]
+         '  <}>
+         '  <for (aggregration(a,b, name, mu_l, mu_h) <- p.relations) {>
+         '  \"N<b>\" -\> \"N<a>\" [arrowhead=\"vee\" arrowtail=\"odiamond\"]
+         '  <}>
+         '  <for (dependency(a,b) <- p.relations) {>
+         '  \"N<b>\" -\> \"N<a>\" [arrowhead=\"normal\"]
+         '  <}>
+         '  <for (inner(a,b) <- p.relations) {>
+         '  \"N<b>\" -\> \"N<a>\" [arrowhead=\"odot\"]
+         '  <}>
          '}";
 }
 
