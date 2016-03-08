@@ -36,22 +36,19 @@ private set[Class] makeClasses(M3 m){
 }
 
 private AccessModifier getAM(M3 m, loc l ){
-	set[Modifier] modi = { f | f <- m@modifiers[l]};
-	println(modi);
-	return final();
+  		println("<m@modifiers[l]>");
+	return pub();
 }
 
 private InheritanceModifier getIM(M3 m, loc l ){
 	set[Modifier] modi = { f | f <- m@modifiers[l]};
-	println(modi);
-	return pub();
+	return final();
 }
 
-private set[method] makeMethods(M3 m3model, class cl){
-	list[loc] methodsSet = { m | m <- M3model@containment[cl], m.scheme == "java+method"};
+//private set[method] makeMethods(M3 m3model, class cl){
+//	list[loc] methodsSet = { m | m <- M3model@containment[cl], m.scheme == "java+method"};
 
-	
-}
+//}
 
 private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
 
