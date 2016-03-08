@@ -52,7 +52,18 @@ private InheritanceModifier getIM(M3 m, loc l ){
 
 private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
 
-	return {};
+	set[ClassRelation] relations = {};
+
+	for(<from, to> <- m@extends){
+		relations += generalization(to, from);
+	}
+	
+	for(<from, to> <- m@implements){
+		relations += realization(to, from);
+	}
+	
+	
+	return relations;
 }
 
 
