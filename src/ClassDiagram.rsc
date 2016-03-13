@@ -160,14 +160,20 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Progr
 
 	set[ClassRelation] relations = {};
 
-	for(<from, to> <- m@extends){
-		relations += generalization(to, from);
+	// Determine all generalization relations
+	for(<parent, child> <- m@extends){
+		relations += generalization(parent, child);
 	}
 	
-	for(<from, to> <- m@implements){
-		relations += realization(to, from);
+	// Determine all realization relations
+	for(<interface, implementation> <- m@implements){
+		relations += realization(implementation, interface);
 	}
 	
+	// Determine all inner class type relations
+	for(<innerClass, containingClass>  <- { <innerClass, containingClass> | containingClass <- classes(m), innerClass <- nestedClasses(m, containingClass) }){
+		relations += inner(innerClass, asd); 
+	}
 	
 	return relations;
 }
