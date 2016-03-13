@@ -17,7 +17,7 @@ public str dotDiagram2(Project p) {
          '  edge [ fontname = \"Bitstream Vera Sans\" fontsize = 8 ]
          '
          '  <for (cl <- p.classes) { >
-         ' 	\"N<cl.id>\" [label=\"{<cl.id>||}\"]
+         ' 	\"N<cl.id>\" [label=\"{<cl.cIModifier> <cl.cAModifier> <cl.name>||<cl.declarations>}\"]
          '  <}>
          '
          '  <for (generalization(a,b) <- p.relations) {>
@@ -43,5 +43,5 @@ public str dotDiagram2(Project p) {
 
 public void callMe(){
 	Project p = makeProject(|project://eLib|);
-	showDot2(p,|project://Assignment2/out/uml.dot|);
+	showDot2(p,|project://Assignment2/out/umlE.dot|);
 }
