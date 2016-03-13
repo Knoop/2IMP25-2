@@ -17,7 +17,14 @@ public str dotDiagram2(Project p) {
          '  edge [ fontname = \"Bitstream Vera Sans\" fontsize = 8 ]
          '
          '  <for (cl <- p.classes) { >
-         ' 	\"N<cl.id>\" [label=\"{<cl.cIModifier> <cl.cAModifier> <cl.name>||<cl.declarations>}\"]
+         ' 	\"N<cl.id>\" [label=\"{<cl.cIModifier> <cl.cAModifier> <cl.name>|
+         '	<for (att <- cl.attributeSet) {>
+         '  <att.aModififier><att.name>: <att.aType> \\l
+         '  <}>|
+         '	<for (met <- cl.methodset) {>
+         '  <met.mModifier><met.name>(): <met.returntype> \\l
+         '  <}>}
+         '	\"]
          '  <}>
          '
          '  <for (generalization(a,b) <- p.relations) {>
@@ -43,5 +50,5 @@ public str dotDiagram2(Project p) {
 
 public void callMe(){
 	Project p = makeProject(|project://eLib|);
-	showDot2(p,|project://Assignment2/out/umlE.dot|);
+	showDot2(p,|project://Assignment2/out/umlTest.dot|);
 }
