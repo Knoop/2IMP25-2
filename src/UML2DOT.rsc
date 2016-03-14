@@ -12,8 +12,8 @@ public void showDot2(Project m, loc out) {
 public str dotDiagram2(Project p) {
   return "digraph classes {
          '  fontname = \"Bitstream Vera Sans\"
-         '  fontsize = 4
-         '  node [ fontname = \"Bitstream Vera Sans\" fontsize = 4 shape = \"record\" ]
+         '  fontsize = 8
+         '  node [ fontname = \"Bitstream Vera Sans\" fontsize = 8 shape = \"record\" ]
          '  edge [ fontname = \"Bitstream Vera Sans\" fontsize = 8 ]
          '
          '  <for (cl <- p.classes) { >
