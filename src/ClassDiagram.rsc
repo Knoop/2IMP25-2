@@ -42,7 +42,7 @@ private set[Class] makeClasses(M3 m){
 	for(cl <- classes(m)){
 	set[Method] allMethods = getMethods(m,cl);
 	set[Attribute ] allAttributes = getAttributes(m,cl);
-		allClasses += class(cl,cl.path[1..], class(), getIM(m,cl), getAM(m,cl),allAttributes, allMethods);
+		allClasses += class(cl,cl.path[1..], "Class", getIM(m,cl), getAM(m,cl),allAttributes, allMethods);
 	}
 	return allClasses;
 }
@@ -175,7 +175,7 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Progr
 
 
 // Each class has a type, a modifier for that type and a set of declarations
-data Class = class(loc id, str name, ClassType cType, str cIModifier, str cAModifier,set[Attribute] attributeSet, set[Method] methodset);
+data Class = class(loc id, str name, str cType, str cIModifier, str cAModifier,set[Attribute] attributeSet, set[Method] methodset);
 
 data Method = method(str name, str returntype, str mModifier);
 data Attribute = attribute(str name, str aType, str aModififier);

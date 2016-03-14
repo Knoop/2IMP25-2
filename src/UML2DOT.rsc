@@ -12,12 +12,12 @@ public void showDot2(Project m, loc out) {
 public str dotDiagram2(Project p) {
   return "digraph classes {
          '  fontname = \"Bitstream Vera Sans\"
-         '  fontsize = 8
-         '  node [ fontname = \"Bitstream Vera Sans\" fontsize = 8 shape = \"record\" ]
+         '  fontsize = 4
+         '  node [ fontname = \"Bitstream Vera Sans\" fontsize = 4 shape = \"record\" ]
          '  edge [ fontname = \"Bitstream Vera Sans\" fontsize = 8 ]
          '
          '  <for (cl <- p.classes) { >
-         ' 	\"N<cl.id>\" [label=\"{<cl.cIModifier> <cl.cAModifier> <cl.name>|
+         ' 	\"N<cl.id>\" [label=\"{((<cl.cType>))\\l<cl.cIModifier> <cl.cAModifier> <cl.name>|
          '	<for (att <- cl.attributeSet) {>
          '  <att.aModififier><att.name>: <att.aType> \\l
          '  <}>|
@@ -49,6 +49,6 @@ public str dotDiagram2(Project p) {
 }
 
 public void callMe(){
-	Project p = makeProject(|project://eLib|);
+	Project p = makeProject(|project://NecoOld|);
 	showDot2(p,|project://Assignment2/out/umlTest.dot|);
 }
