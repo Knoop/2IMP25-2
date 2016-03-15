@@ -39,9 +39,6 @@ public str dotDiagram2(Project p) {
          '  <for (association(a,b, name, mu, hasUpper) <- p.relations) {>
          '  <outputAssociation(a,b,name,mu,hasUpper)>
          '  <}>
-         '  <for (aggregration(a,b, name, mu_l, mu_h) <- p.relations) {>
-         '  \"N<a>\" -\> \"N<b>\" [arrowhead=\"vee\" arrowtail=\"odiamond\"]
-         '  <}>
          '  <for (dependency(a,b) <- p.relations) {>
          '  \"N<a>\" -\> \"N<b>\" [arrowhead=\"normal\"]
          '  <}>

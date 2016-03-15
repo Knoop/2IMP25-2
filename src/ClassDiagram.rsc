@@ -365,5 +365,4 @@ data ClassRelation
 	| dependency(loc a, loc b)
 	| generalization(loc a, loc b)
 	| realization(loc a, loc b)
-	| inner(loc a, loc b)
-	| generic(loc a, loc b);
+	| inner(loc a, loc b);
