@@ -6,6 +6,7 @@ import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import lang::java::m3::TypeSymbol;
 
+import Program2OFG;
 import IO;
 import ListRelation;
 import vis::Figure; 
@@ -20,17 +21,17 @@ import util::ValueUI;
 import util::Math;
 
 data Project = project(set[Class] classes, set[ClassRelation] relations);
-
+alias OFG = rel[loc from, loc to];
 
 public Project makeProject(loc projectLocation){
 	
 	// Obtain M3 and OFG
 	m = createM3FromEclipseProject(projectLocation);
-	p = createOFG(projectLocation);
+	ofg = createOFGFromProgram(createOFG(projectLocation));
 	
 	allClasses = makeClasses(m);
 	
-	allRelations = makeClassRelations(allClasses, m, p);
+	allRelations = makeClassRelations(allClasses, m, ofg);
 	
 	return project(allClasses, allRelations);
 	
@@ -156,7 +157,7 @@ private str getReturnType(TypeSymbol t, rel[loc,str] iNames){
 	return "Return type not readable <t>";
 }
 
-private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Program p){
+private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, OFG ofg){
 
 	set[ClassRelation] relations = {};
 
@@ -172,13 +173,32 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Progr
 	
 	// Determine all inner class type relations
 	for(<innerClass, containingClass>  <- { <innerClass, containingClass> | containingClass <- classes(m), innerClass <- nestedClasses(m, containingClass) }){
-		relations += inner(innerClass, asd); 
+		relations += inner(innerClass, containingClass); 
 	}
+	
+	// Add dependencies
+	for(<source, targetClass> <- ofg, source != targetClass, targetClass in classes(m), source.scheme == "java+parameter" || source.scheme == "java+variable"){
+		for(sourceClass <- getClass(source, m), sourceClass != targetClass, dependency(sourceClass,targetClass) notin relations)
+			relations += dependency(sourceClass, targetClass);
+	}
+	
 	
 	return relations;
 }
 
 
+//finds class of given location
+set[loc] getClass(loc location, M3 m) {	 
+  if (isClass(location))
+    return {location}; 
+  if (isField(location))
+    return {cl | cl <- classes(m), location in fields(m, cl)};
+  if (isMethod(location))
+    return {cl | cl <- classes(m), location in methods(m, cl)};
+
+  //either parameter or local variable
+  return {cl | cl <- classes(m), method <- elements(m, cl), isMethod(method), paramOrVar <- elements(m, method), location == paramOrVar};
+}
 
 // Each class has a type, a modifier for that type and a set of declarations
 data Class = class(loc id, str name, ClassType cType, str cIModifier, str cAModifier,set[Attribute] attributeSet, set[Method] methodset);
