@@ -161,7 +161,7 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, Progr
 	set[ClassRelation] relations = {};
 
 	// Determine all generalization relations
-	for(<parent, child> <- m@extends){
+	for(<child, parent> <- m@extends){
 		relations += generalization(parent, child);
 	}
 	
