@@ -69,7 +69,6 @@ private str outputAssociation(loc sourceClass, loc targetClass,str name,int mult
 	return result;
 }
 
-public void callMe(){
-	Project p = makeProject(|project://NecoOld|);
-	showDot2(p,|project://Assignment2/out/umlTest.dot|);
+public void createUMLFromProject(loc project, loc output){
+	showDot2(makeProject(project),output);
 }
