@@ -40,21 +40,53 @@ public Project makeProject(loc projectLocation){
 // Creates a set of all classes from the given M3. 
 private set[Class] makeClasses(M3 m){
 	set[Class] allClasses = {};
+	
+	// Create a set of all interfaces
+	for(cl <- interfaces(m)){
+		allClasses += getClasses(m,cl, "Interface");
+	}
+	
+	// Create a set of all enumerations
+	for(cl <- enums(m)){
+		allClasses += getClasses(m,cl, "Enumeration");	
+	}
+	
+	// Create a set of all anonymous classes
+	for(cl <- anonymousClasses(m)){
+		allClasses += getClasses(m,cl, "Anonymous class");
+	}
+	
+	// Create a set of all normal classes
 	for(cl <- classes(m)){
-	set[Method] allMethods = getMethods(m,cl);
-	set[Attribute ] allAttributes = getAttributes(m,cl);
-		allClasses += class(cl,cl.path[1..], class(), getIM(m,cl), getAM(m,cl),allAttributes, allMethods);
+		allClasses += getClasses(m,cl, "Class");
 	}
 	return allClasses;
 }
+private Class getClasses(M3 m, loc cl, str cType){
+	// get all methods 
+	set[Method] allMethods = getMethods(m,cl);
+	// get all attributes
+	set[Attribute ] allAttributes = getAttributes(m,cl);
+	// get all inner classes
+	set[loc] innerClassSet = { e | e <- m@containment[cl], isClass(e)};
+	for(l<- innerClassSet){
+		getClasses(m,l,cType);
+	}
+	return class(cl,cl.path[1..], cType, getIM(m,cl), getAM(m,cl),allAttributes, allMethods);
+}
+
 
 private set[Attribute] getAttributes(M3 m, loc l){
 	set[Attribute] allAttributes = {};
+	// get all attributes
 	set[loc] attributeSet = {e | e<- m@containment[l], isField(e)}; 
 	
+	// get the types that mather
 	typeAttribute = domainR(m@types, attributeSet);
 	modifierAttribute = domainR(m@modifiers, attributeSet);
 	iNames = invert(m@names);
+	
+	// get the name, return type and modifiers that define an attribute
 	for( att <- attributeSet){
 		allAttributes += 
 		attribute(
@@ -68,12 +100,15 @@ private set[Attribute] getAttributes(M3 m, loc l){
 
 private set[Method] getMethods(M3 m, loc l){
 	set[Method] allMethods = {};
+	// get all methods
 	set[loc] methodSet = { e | e <- m@containment[l], isMethod(e)};
 	
+	// get all the types that mather
 	typeMethod = domainR(m@types, methodSet);
 	modifierMethod = domainR(m@modifiers, methodSet);
 	iNames= invert(m@names);
 	
+	// get the name, return type and modifiers that define a method
 	for(met <- methodSet){
 		allMethods += 
 			method(
@@ -85,6 +120,7 @@ private set[Method] getMethods(M3 m, loc l){
 	return allMethods;
 }
 
+// translate modifiers to readable format
 private str getModiMeth(set[Modifier] modi){
 	str result = "";
 	for(m<- modi){
@@ -104,6 +140,7 @@ private str getModiMeth(set[Modifier] modi){
 	return result;
 }
 
+// translate access modifiers to readable format
 private str getAM(M3 m, loc l ){
   	for(modi <- m@modifiers[l] ){
 		switch(modi){
@@ -116,9 +153,8 @@ private str getAM(M3 m, loc l ){
 	}
 	return "";
 }
-
  
-
+// translate inheretance modifiers to readable format
 private str getIM(M3 m, loc l ){
 	for(modi <- m@modifiers[l] ){
 		switch(modi){
@@ -132,6 +168,7 @@ private str getIM(M3 m, loc l ){
 	return "";
 }
 
+// translate return types to readable format
 private str getReturnType(TypeSymbol t, rel[loc,str] iNames){
 	switch(t){
 		case \int(): return "int";
@@ -186,6 +223,7 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, OFG o
 	return relations;
 }
 
+set[loc] anonymousClasses(M3 m) = { e | e <- m@declarations<name>, e.scheme == "java+anonymousClass" };
 
 //finds class of given location
 set[loc] getClass(loc location, M3 m) {	 
@@ -200,9 +238,10 @@ set[loc] getClass(loc location, M3 m) {
   return {cl | cl <- classes(m), method <- elements(m, cl), isMethod(method), paramOrVar <- elements(m, method), location == paramOrVar};
 }
 
-// Each class has a type, a modifier for that type and a set of declarations
-data Class = class(loc id, str name, ClassType cType, str cIModifier, str cAModifier,set[Attribute] attributeSet, set[Method] methodset);
+data Class = class(loc id, str name, str cType, str cIModifier, str cAModifier,set[Attribute] attributeSet, set[Method] methodset);
 
+
+// Each class has a type, a modifier for that type and a set of declarations
 data Method = method(str name, str returntype, str mModifier);
 data Attribute = attribute(str name, str aType, str aModififier);
 data ClassType 
