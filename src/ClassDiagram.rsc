@@ -48,14 +48,19 @@ set[str] hiddenTypes = {
 
 public Project makeProject(loc projectLocation){
 	
+	println("Creating project");
 	// Obtain M3 and OFG
+	println("Creating project :: creating m3 model");
 	m = createM3FromEclipseProject(projectLocation);
+	println("Creating project :: creating OFG");
 	ofg = createOFGFromProgram(createOFG(projectLocation));
 	
+	println("Creating project :: creating all classes");
 	allClasses = makeClasses(m);
 	
+	println("Creating project :: creating all relations between classes");
 	allRelations = makeClassRelations(allClasses, m, ofg);
-	
+	println("Creating project :: done");
 	return project(allClasses, allRelations);
 	
 }
@@ -70,7 +75,7 @@ private set[Class] makeClasses(M3 m){
 	}
 	
 	// Create a set of all enumerations
-	for(cl <- enums(m)){
+	for(cl <- m@declarations<name>, cl.scheme == "java+enum"){
 		allClasses += getClasses(m,cl, "Enumeration");	
 	}
 	
