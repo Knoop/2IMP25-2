@@ -22,6 +22,29 @@ import util::Math;
 
 data Project = project(set[Class] classes, set[ClassRelation] relations);
 alias OFG = rel[loc from, loc to];
+set[str] containerClasses =  {
+	 "/java/util/Map"
+	,"/java/util/HashMap"
+	,"/java/util/Collection"
+	,"/java/util/Set"
+	,"/java/util/HashSet"
+	,"/java/util/LinkedHashSet"
+	,"/java/util/List"
+	,"/java/util/ArrayList"
+	,"/java/util/LinkedList"
+};
+
+set[str] hiddenTypes = {
+	"Byte" ,"/java/lang/Byte"
+	,"Character" ,"/java/lang/Character"
+	,"Short" ,"/java/lang/Short"
+	,"Integer" ,"/java/lang/Integer"
+	,"Long" ,"/java/lang/Long"
+	,"Float" ,"/java/lang/Float"
+	,"Double" ,"/java/lang/Double"
+	,"String","/java/lang/String", *containerClasses
+};
+
 
 public Project makeProject(loc projectLocation){
 	
@@ -213,9 +236,79 @@ private set[ClassRelation] makeClassRelations(set[Class] allClasses, M3 m, OFG o
 		relations += inner(innerClass, containingClass); 
 	}
 	
+	/* 	Mapping containing dependencies and a count of those dependencies.
+		A relation between two classes is mapped to two integers. The two integers 
+		indicate a high and low multiplicity count. The count can indicate multiple things:
+			<0,false> = A dependency exist. The a class does not have an attribute of the b type. 
+			<x,false> = A dependency exists as a form of association. The a class has exactly x instances of an attribute with type b. 
+			<x,true> = A dependency exists as a form of association. The a class has at least x instances of an attribute with type b.
+	*/	
+	map[tuple[loc a, loc b], tuple[int multiplicity, bool hasUpperLimit]] associations = ();
+  	
+	// find all classes that have a relation through a variable/parameter, but skip any primitives
+	for(<source, target> <- m@typeDependency, source.scheme == "java+field", sourceClass <- getClass(source, m), sourceClass != target) {	
+
+		set[loc] targetClasses;
+		bool wasContainer = false;
+		if(target.path in containerClasses){
+			wasContainer = true;
+			targetClasses = ofg[source];
+			//println("Found containerClass <target>. Linked to: <for(cl <- targetClasses){> <cl> <}>");
+		} else {
+			targetClasses = [target];
+		}
+		
+		// Link the target with the sourcce. 
+		for(targetClass <- targetClasses, targetClass.scheme == "java+class", targetClass.path notin hiddenTypes){
+		
+			if(<sourceClass, targetClass> notin associations){
+		    	associations[<sourceClass, targetClass>] = <0, true>;
+		    	//println("Added new association for <sourceClass> <targetClass>");
+			}
+			
+			counter = associations[<sourceClass, targetClass>];
+			
+			if(wasContainer){
+				// In case of a container the upper limit is removed, the lower limit remains
+		    	associations[<sourceClass, targetClass>] = <counter.multiplicity, false>;
+		    	//println("Added association <sourceClass> <targetClass> <counter.multiplicity> false");
+		  	} else {
+		    	// In case of a regular field the upper limit remains, and the lower limit is increased
+		    	associations[<sourceClass, targetClass>] = <counter.multiplicity + 1, counter.hasUpperLimit>;
+		    	//println("Added association <sourceClass> <targetClass> <counter.multiplicity + 1> <counter.hasUpperLimit>");
+		  	}
+	  	}
+			
+	}
+	
+	// Determine multiplicity for fields and the like
+	
+	/*
+	for ( ... )
+	{
+		dependencies += (x:y);
+	}
+	*/
+	
+	// Turn the aggregrations into the relations
+	for(<<a,b>,<c,d>> <- toRel(associations)){
+		// The relationship comes from attributes.
+		if(c == 0 && !d || c == 1 && d)
+			// The attribute is a single attribute, that may be a container. 
+			// Use the name of the attribute for the association
+			relations += association(a,b,"",c,d);
+		else if(c > 0)
+			// If there are multiple attributes, don't use a name at all. 
+			// (Possible expansion: add a relation for every attribute)
+			relations += association(a,b,"",c,d);		
+	}
+	
+	
 	// Add dependencies
 	for(<source, targetClass> <- ofg, source != targetClass, targetClass in classes(m), source.scheme == "java+parameter" || source.scheme == "java+variable"){
-		for(sourceClass <- getClass(source, m), sourceClass != targetClass, dependency(sourceClass,targetClass) notin relations)
+		for(sourceClass <- getClass(source, m), sourceClass != targetClass, dependency(sourceClass,targetClass) notin relations,
+		// Prevent dependencies that are already covered through other means 
+		<sourceClass, targetClass> notin associations, generalization(targetClass, sourceClass) notin relations, realization(sourceClass, targetClass) notin relations)
 			relations += dependency(sourceClass, targetClass);
 	}
 	
@@ -263,7 +356,7 @@ data InheritanceModifier
 	| none();
 	
 data ClassRelation
-	= association(loc a, loc b, str name, int multiplicity_low, int multiplicity_high)
+	= association(loc a, loc b, str name, int multiplicity, bool hasUpperBound)
 	| dependency(loc a, loc b)
 	| generalization(loc a, loc b)
 	| realization(loc a, loc b)
